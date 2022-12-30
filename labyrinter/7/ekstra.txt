@@ -1,0 +1,43 @@
+public Rute nabo(char c){
+    if(c == 'n'){
+        this.rute = this.nord;
+    }if(c == 's'){
+        this.rute = this.sor;
+    }if(c == 'o'){
+        this.rute = this.ost;
+    }if(c == 'v'){
+        this.rute = this.vest;
+    }
+
+    return this.rute;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+    public Liste<String> kortUtvei(int startKol, int startRad){
+        Rute startRute = this.lbArray.get(startRad).get(startKol);
+
+        Liste<String> vei = new Lenkeliste <>();
+
+        System.out.println("Det er " + this.utveier.stoerrelse() + " utvei(er) fra dette punktet.\nDen korteste er:");
+
+        if(startRute.kortesteUtvei != null){
+            for(Rute rute : startRute.kortesteUtvei){
+                vei.leggTil(rute.toString());
+            }
+        }
+
+        return vei;
+    }
+
+    System.out.println("\nAntall utveier: " + utveier.stoerrelse());
+                    l.kortUtvei(startKol, startRad);

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+
+    <! –– Page and navigationbars settings ––>
+    .error {
+        color: red;
+    }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    .topnav {
+      overflow: hidden;
+      background-color: black;
+    }
+
+    .topnav a {
+      float: left;
+      color: white;
+      text-align: center;
+      padding: 14px 16px;
+      text-decoration: none;
+      font-size: 17px;
+    }
+
+    .topnav a:hover {
+      background-color: gray;
+      color: black;
+    }
+
+    .topnav a.active {
+      background-color: lightgreen;
+      color: white;
+    }
+
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega@5"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega-lite@4.8.1"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega-embed@6"></script>
+</head>
+<body>
+
+    <div class="topnav">
+      <a class="active" href ="/">Home</a>
+      <a href="/docs">FastAPI Docs</a>
+      <a href="/help">Help</a>
+    
+    </div>
+
+    <h1>Daily new confirmed COVID-19</h1>
+    <! –– Checkbox for countries ––>
+    <div id="vis"></div>
+    <h2>Countries</h2>
+    <form action="javascript:refreshPlot()" id="countries-form">
+      {% for country in countries %}
+      <input type="checkbox" name="{{ country }}" value="{{ country }}" checked />
+      <label for="{{ country }}">{{ country }}</label>
+      <br />
+      {% endfor %}
+      <br />
+
+      <! –– slidecontainer for time ––>
+      <div class="slidecontainer">
+        <b>Try changing the time range!</b>
+        <br />
+        <input type="range" list="tickmarks" id="TimeRange">
+        <datalist>
+        <option value="start" label=start></option>
+        <option value="end" label=end></option>
+        </datalist>
+      </div>
+      <br />
+      
+      <! –– Refresh button ––>
+      <button type="submit">Refresh</button>
+      <br />
+      <br />
+    </form>
+  <script>
+
+
+  //refresh function
+  async function refreshPlot(){
+
+      // get selected checkboxes
+      var selected = [];
+      for (checkbox of document
+        .getElementById("countries-form")
+        .querySelectorAll("input[type=checkbox]")) {
+        if (checkbox.checked) {
+            selected.push(checkbox.value);
+        }
+      }
+      var countryParam = "?countries=" + encodeURIComponent(selected.join(","));
+
+      var response = await fetch("plot_reported_cases_per_million.json" + countryParam);
+      var spec = await response.json();
+
+      var embedOpt = {"mode": "vega-lite"};
+
+      function showError(el, error){
+          el.innerHTML = ('<div class="error" style="color:red;">'
+                          + '<p>JavaScript Error: ' + error.message + '</p>'
+                          + "<p>This usually means there's a typo in your chart specification. "
+                          + "See the javascript console for the full traceback.</p>"
+                          + '</div>');
+          throw error;
+      }
+      const el = document.getElementById('vis');
+      vegaEmbed("#vis", spec, embedOpt)
+        .catch(error => showError(el, error));
+    }
+    refreshPlot();
+
+  </script>
+</body>
+</html> 
+
+
